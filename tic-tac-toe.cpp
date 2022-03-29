@@ -62,6 +62,7 @@ int main()
         }
         // Loop for turn taking in game
         int positionsRemaining = SIZE * SIZE;
+        int row, col;
         bool userWon = false;
         bool computerWon = false;
         while ((positionsRemaining > 0) && (!userWon) && (!computerWon))
@@ -79,8 +80,8 @@ int main()
                     cin >> position_id;
                     if ((position_id <= (SIZE * SIZE)) && (position_id > 0))
                     {
-                        int row = (position_id - 1) / SIZE;
-                        int col = (position_id - 1) % SIZE;
+                        row = (position_id - 1) / SIZE;
+                        col = (position_id - 1) % SIZE;
                         // cout << "row = " << row << " col = " << col << endl;
                         if (validSpace(board, row, col))
                         {
@@ -106,8 +107,6 @@ int main()
             {
                 cout << "Computer turn:" << endl;
                 // The row and col are both passed as call-by-reference
-                int row, col;
-
                 generateComputerMove(board, row, col);
                 board[row][col] = "O";
 
