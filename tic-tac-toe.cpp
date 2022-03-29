@@ -10,47 +10,35 @@ using namespace std;
 
 const int SIZE = 3;
 
-void displayBoard(string **b);
+void displayBoard(string b[][SIZE]);
 bool userFirst();
-bool validSpace(string **b, int &row, int &col);
+bool validSpace(string b[][SIZE], int &row, int &col);
 void pickRandomSpace(int &row, int &col);
-void generateComputerMove(string **b, int &row, int &col);
-bool currentPlayerWon(string **b, string symbol);
+void generateComputerMove(string b[][SIZE], int &row, int &col);
+bool currentPlayerWon(string b[][SIZE], string symbol);
 
 int main()
 {
     int xScore = 0;
     int oScore = 0;
     int ties = 0;
-    int round = 1;
-    cout << "\nWelcome to Tic-Tac-Toe" << endl;
+
+    string board[SIZE][SIZE];
+    int row, col;
     while (true)
     {
         // construct board
-        // string board[SIZE][SIZE];
-        string **board = new string *[SIZE];
-        for (int i = 0; i < SIZE; i++)
-        {
-            board[i] = new string[SIZE];
-        }
-
         int position_id = 1;
         for (int i = 0; i < SIZE; i++)
         {
             for (int j = 0; j < SIZE; j++)
             {
                 board[i][j] = to_string(position_id);
-                /*
-                    stringstream ss;
-                    ss << position_id;
-                    board[i][j] = ss.str();
-                */
                 position_id++;
             }
         }
         // Initial game output
-        cout << "\nRound:" << round << endl;
-        round++;
+        cout << "\nWelcome to Tic-Tac-Toe" << endl;
         bool userTurn = userFirst();
         if (userTurn == true)
         {
@@ -62,7 +50,6 @@ int main()
         }
         // Loop for turn taking in game
         int positionsRemaining = SIZE * SIZE;
-        int row, col;
         bool userWon = false;
         bool computerWon = false;
         while ((positionsRemaining > 0) && (!userWon) && (!computerWon))
@@ -82,7 +69,6 @@ int main()
                     {
                         row = (position_id - 1) / SIZE;
                         col = (position_id - 1) % SIZE;
-                        // cout << "row = " << row << " col = " << col << endl;
                         if (validSpace(board, row, col))
                         {
                             board[row][col] = "X";
@@ -142,7 +128,7 @@ int main()
         }
     }
 
-    cout << "\nResults:" << endl;
+    cout << "Results:" << endl;
     cout << "X:    " << xScore << endl;
     cout << "O:    " << oScore << endl;
     cout << "Ties: " << ties << endl;
@@ -151,7 +137,7 @@ int main()
     return 0;
 }
 
-void displayBoard(string **b)
+void displayBoard(string b[][SIZE])
 {
     cout << "Tic-tac-toe board:" << endl
          << endl;
@@ -181,7 +167,7 @@ bool userFirst()
     return true;
 }
 
-bool validSpace(string **b, int &row, int &col)
+bool validSpace(string b[][SIZE], int &row, int &col)
 {
     return (b[row][col] != "O" && b[row][col] != "X");
 }
@@ -193,10 +179,10 @@ void pickRandomSpace(int &row, int &col)
     col = rand() % SIZE;
 }
 
-void generateComputerMove(string **b, int &row, int &col)
+void generateComputerMove(string b[][SIZE], int &row, int &col)
 {
     int count;
-    //#1 Check winning condition:
+    //#1 Check winning condition (OO)
     // Horizontal case
     // Loop through each row
     for (int i = 0; i < SIZE; i++)
@@ -292,7 +278,7 @@ void generateComputerMove(string **b, int &row, int &col)
         }
     }
 
-    //#2 Check the opponent winning condition and counter
+    //#2 Check the opponent winning condition and counter (XX)
     // Horizontal case
     // Loop through each row
     for (int i = 0; i < SIZE; i++)
@@ -388,8 +374,8 @@ void generateComputerMove(string **b, int &row, int &col)
         }
     }
 
-    //#3 Create single winning condition
-    // Horizontal case
+    //#3 Check winning conditions (O)
+    // Horizontal and Vertical case
     // Loop through each row
     for (int i = 0; i < SIZE; i++)
     {
@@ -403,47 +389,38 @@ void generateComputerMove(string **b, int &row, int &col)
             }
             else if (b[i][j] == "X")
             {
+                count = 0;
                 break;
             }
             if (count == 1)
             {
                 for (int j = 0; j < SIZE; j++)
                 {
-                    row = i;
-                    col = j;
-                    if (validSpace(b, row, col))
+                    if (b[i][j] == "O")
                     {
-                        return;
+                        break;
                     }
-                }
-            }
-        }
-    }
-    // Vertical case
-    // Loop through each column
-    for (int i = 0; i < SIZE; i++)
-    {
-        count = 0;
-        // Check all positions in column and see if they are the same symbol
-        for (int j = 0; j < SIZE; j++)
-        {
-            if (b[j][i] == "O")
-            {
-                count++;
-            }
-            else if (b[j][i] == "X")
-            {
-                break;
-            }
-            if (count == 1)
-            {
-                for (int j = 0; j < SIZE; j++)
-                {
-                    row = j;
-                    col = i;
-                    if (validSpace(b, row, col))
+                    count = 0;
+                    for (int k = 0; k < SIZE; k++)
                     {
-                        return;
+                        if (b[k][j] == "O")
+                        {
+                            count++;
+                        }
+                        else if (b[k][j] == "X")
+                        {
+                            count = 0;
+                            break;
+                        }
+                        if (count == 1)
+                        {
+                            row = i;
+                            col = j;
+                            if (validSpace(b, row, col))
+                            {
+                                return;
+                            }
+                        }
                     }
                 }
             }
@@ -465,11 +442,40 @@ void generateComputerMove(string **b, int &row, int &col)
         {
             for (int i = 0; i < SIZE; i++)
             {
-                row = i;
-                col = i;
-                if (validSpace(b, row, col))
+                if (b[i][i] == "O")
                 {
-                    return;
+                    break;
+                }
+                count = 0;
+                for (int j = 0; j < SIZE; j++)
+                {
+                    if (b[i][j] == "X")
+                    { // check Horizontal
+                        count++;
+                    }
+                    else if (b[i][j] == "O")
+                    {
+                        count = 0;
+                        break;
+                    }
+                    if (b[j][i] == "X")
+                    { // check Vertical
+                        count++;
+                    }
+                    else if (b[j][i] == "O")
+                    {
+                        count = 0;
+                        break;
+                    }
+                    if (count == 1)
+                    {
+                        row = i;
+                        col = i;
+                        if (validSpace(b, row, col))
+                        {
+                            return;
+                        }
+                    }
                 }
             }
         }
@@ -490,17 +496,208 @@ void generateComputerMove(string **b, int &row, int &col)
         {
             for (int i = 0; i < SIZE; i++)
             {
-                row = (SIZE - 1) - i;
-                col = i;
-                if (validSpace(b, row, col))
+                if (b[(SIZE - 1) - i][i] == "O")
                 {
-                    return;
+                    break;
+                }
+                count = 0;
+                for (int j = 0; j < SIZE; j++)
+                {
+                    if (b[(SIZE - 1) - i][j] == "X")
+                    { // check Horizontal
+                        count++;
+                    }
+                    else if (b[(SIZE - 1) - i][j] == "O")
+                    {
+                        count = 0;
+                        break;
+                    }
+                    if (b[j][(SIZE - 1) - i] == "X")
+                    { // check Vertical
+                        count++;
+                    }
+                    else if (b[j][(SIZE - 1) - i] == "O")
+                    {
+                        count = 0;
+                        break;
+                    }
+                    if (count == 1)
+                    {
+                        row = (SIZE - 1) - i;
+                        col = i;
+                        if (validSpace(b, row, col))
+                        {
+                            return;
+                        }
+                    }
                 }
             }
         }
     }
 
-    //#4 Middle position move
+    //#4 Check the opponent winning conditions and counter (X)
+    // Horizontal and Vertical case
+    for (int i = 0; i < SIZE; i++)
+    {
+        count = 0;
+        // Check all positions in row and see if they are the same symbol
+        for (int j = 0; j < SIZE; j++)
+        {
+            if (b[i][j] == "X")
+            {
+                count++;
+            }
+            else if (b[i][j] == "O")
+            {
+                count = 0;
+                break;
+            }
+            if (count == 1)
+            {
+                for (int j = 0; j < SIZE; j++)
+                {
+                    if (b[i][j] == "X")
+                    {
+                        break;
+                    }
+                    count = 0;
+                    for (int k = 0; k < SIZE; k++)
+                    {
+                        if (b[k][j] == "X")
+                        {
+                            count++;
+                        }
+                        else if (b[k][j] == "O")
+                        {
+                            count = 0;
+                            break;
+                        }
+                        if (count == 1)
+                        {
+                            row = i;
+                            col = j;
+                            if (validSpace(b, row, col))
+                            {
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // Diagonal case #1
+    count = 0;
+    for (int i = 0; i < SIZE; i++)
+    {
+        if (b[i][i] == "X")
+        {
+            count++;
+        }
+        else if (b[i][i] == "O")
+        {
+            count = 0;
+            break;
+        }
+        if (count == 1)
+        {
+            for (int i = 0; i < SIZE; i++)
+            {
+                if (b[i][i] == "X")
+                {
+                    break;
+                }
+                count = 0;
+                for (int j = 0; j < SIZE; j++)
+                {
+                    if (b[i][j] == "X")
+                    { // check Horizontal
+                        count++;
+                    }
+                    else if (b[i][j] == "O")
+                    {
+                        count = 0;
+                        break;
+                    }
+                    if (b[j][i] == "X")
+                    { // check Vertical
+                        count++;
+                    }
+                    else if (b[j][i] == "O")
+                    {
+                        count = 0;
+                        break;
+                    }
+                    if (count == 1)
+                    {
+                        row = i;
+                        col = i;
+                        if (validSpace(b, row, col))
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // Diagonal case #2
+    count = 0;
+    for (int i = 0; i < SIZE; i++)
+    {
+        if (b[(SIZE - 1) - i][i] == "X")
+        {
+            count++;
+        }
+        else if (b[(SIZE - 1) - i][i] == "O")
+        {
+            count = 0;
+            break;
+        }
+        if (count == 1)
+        {
+            for (int i = 0; i < SIZE; i++)
+            {
+                if (b[(SIZE - 1) - i][i] == "X")
+                {
+                    break;
+                }
+                count = 0;
+                for (int j = 0; j < SIZE; j++)
+                {
+                    if (b[(SIZE - 1) - i][j] == "X")
+                    { // check Horizontal
+                        count++;
+                    }
+                    else if (b[(SIZE - 1) - i][j] == "O")
+                    {
+                        count = 0;
+                        break;
+                    }
+                    if (b[j][(SIZE - 1) - i] == "X")
+                    { // check Vertical
+                        count++;
+                    }
+                    else if (b[j][(SIZE - 1) - i] == "O")
+                    {
+                        count = 0;
+                        break;
+                    }
+                    if (count == 1)
+                    {
+                        row = (SIZE - 1) - i;
+                        col = i;
+                        if (validSpace(b, row, col))
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //#5 Middle position move
     if ((b[1][1] != "X") && (b[1][1] != "O"))
     {
         row = 1;
@@ -508,7 +705,7 @@ void generateComputerMove(string **b, int &row, int &col)
         return;
     }
 
-    //#5 Random move
+    //#6 Random move
     while (true)
     {
         pickRandomSpace(row, col);
@@ -520,7 +717,7 @@ void generateComputerMove(string **b, int &row, int &col)
 }
 
 // Return true if player/computer with symbol (X or O) has won
-bool currentPlayerWon(string **b, string symbol)
+bool currentPlayerWon(string b[][SIZE], string symbol)
 {
     // Horizontal case
     // Loop through each row
