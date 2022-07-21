@@ -28,13 +28,13 @@ int main()
     while (true)
     {
         // construct board
-        int position_id = 1;
+        int positionId = 1;
         for (int i = 0; i < SIZE; i++)
         {
             for (int j = 0; j < SIZE; j++)
             {
-                board[i][j] = to_string(position_id);
-                position_id++;
+                board[i][j] = to_string(positionId);
+                positionId++;
             }
         }
         // Initial game output
@@ -62,13 +62,21 @@ int main()
                 bool validMove = false;
                 while (!validMove)
                 {
-                    int position_id;
-                    cout << "Enter a position: ";
-                    cin >> position_id;
-                    if ((position_id <= (SIZE * SIZE)) && (position_id > 0))
+                    char user_input;
+                    while (true) {
+                        cout << "Enter a position: ";
+                        cin >> user_input;
+                        if (isdigit(user_input)) {
+                            break;
+                        } else {
+                            cout << "Invalid input. Try again." << endl;
+                        }
+                    }
+                    int positionId = user_input - '0';
+                    if ((positionId <= (SIZE * SIZE)) && (positionId > 0))
                     {
-                        row = (position_id - 1) / SIZE;
-                        col = (position_id - 1) % SIZE;
+                        row = (positionId - 1) / SIZE;
+                        col = (positionId - 1) % SIZE;
                         if (validSpace(board, row, col))
                         {
                             board[row][col] = "X";
@@ -120,20 +128,22 @@ int main()
         }
 
         char next;
-        cout << "Continue? Y / N: ";
-        cin >> next;
-        if (next == 'N' || next == 'n')
-        {
-            break;
+        while (true) {
+            cout << "Play again? (y/n): ";
+            cin >> next;
+            if (next == 'y' || next == 'Y') {
+                break;
+            } else if (next == 'n' || next == 'N') {
+                cout << "Thanks for playing!" << endl;
+                cout << "X: " << xScore << endl;
+                cout << "O: " << oScore << endl;
+                cout << "Ties: " << ties << endl;
+                return 0;
+            } else {
+                cout << "Invalid input. Try again." << endl;
+            }
         }
     }
-
-    cout << "Results:" << endl;
-    cout << "X:    " << xScore << endl;
-    cout << "O:    " << oScore << endl;
-    cout << "Ties: " << ties << endl;
-    cout << "GG" << endl;
-
     return 0;
 }
 
