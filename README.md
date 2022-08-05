@@ -1,1 +1,1 @@
-# Tic-tac-toe Game - Thinh Le
+# Tic-tac-toe Bot - Thinh Le
